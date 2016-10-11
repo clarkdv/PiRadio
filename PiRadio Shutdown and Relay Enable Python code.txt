@@ -1,0 +1,42 @@
+#!/bin/python  
+# Shutdown NOW and Shutdown DELAY at the press of a button.  
+# /home/pi/scripts/shutdown_pi.py 
+
+import RPi.GPIO as GPIO
+import time
+import os
+
+# Use the Broadcom SOC Pin numbers  
+# Setup the Pin with Internal pullups enabled and PIN in reading mode.  
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(23, GPIO.IN, pull_up_down = GPIO.PUD_UP)  # RED Button
+GPIO.setup(24, GPIO.IN, pull_up_down = GPIO.PUD_UP)  # YELLOW Button
+GPIO.setup(25, GPIO.OUT)  # To Trinket to tell it the Pi is booted up
+GPIO.output(25, GPIO.HIGH)  # Set to HIGH so Arduino Trinket knows Pi is booted up
+
+# Our function on what to do when the button is pressed  
+def ShutdownNOW(channel):
+    os.system("sudo shutdown -h now")
+
+def ShutdownDELAY(channel):
+    os.system("sudo shutdown -h +1")
+
+# Add our function to execute when the button pressed event happens  
+GPIO.add_event_detect(23, GPIO.FALLING, callback = ShutdownNOW, bouncetime = 2000)
+GPIO.add_event_detect(24, GPIO.FALLING, callback = ShutdownDELAY, bouncetime = 2000)
+
+# Now wait!  
+while 1:
+    time.sleep(1)
+
+
+After saving the python script, you need to do a chmod to make it executable:
+
+sudo chmod +x /home/pi/scripts/shutdown_pi.py
+
+
+To run a python script at startup or reboot via crontab:
+
+crontab -e
+
+@reboot python /home/pi/scripts/shutdown_pi.py

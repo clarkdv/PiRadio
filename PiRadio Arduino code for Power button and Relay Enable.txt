@@ -1,0 +1,54 @@
+// RasPi Radio Power Button for Relay
+// Made by Patrick Clark
+// License: CC-BY-SA 3.0
+
+// I used a Adafruit Trinket Arduino compatible board for this, 
+// you can use any Arduino compatible board you prefer so long 
+// as it has at least 2 Digital pins and 1 Analog pin.
+
+const int buttonPin = 2;     // Power "ON" signal from Green pushbutton
+const int RELAYpin = 1;     // 5V relay control pin
+int Pival = 0;
+
+unsigned long interval = 60000;   //60000 = 60 seconds - How long to keep Relay output HIGH
+unsigned long startTime;
+byte lastPress;
+
+void setup() 
+{                
+  pinMode(buttonPin, INPUT);   // Set buttonPin as a digital input
+  pinMode(RELAYpin, OUTPUT);  // Set Relaypin as a digital output
+}
+//
+void loop() {
+Pival = analogRead(2);  //  Read the analog voltage on Trinket Pin #4 (which is Analog2) from GPIO25 on Pi
+
+ if (Pival > 450)       //  IF the Analog input has 3.3V from GPIO25 (Pi is booted) then keep relays enabled
+ {
+  digitalWrite(RELAYpin, HIGH);    //  Turn 5V Relay ON
+ }
+
+ else {             //  Otherwise, run the loop that watches for the Green button to be pressed
+  
+ 
+{
+ byte pressed = digitalRead(buttonPin);
+ if (pressed)
+ {
+   if (pressed != lastPress)
+   {
+  digitalWrite(RELAYpin, HIGH);   //  Turn 5V Relay ON
+     startTime = millis();
+   }
+ }
+ lastPress = pressed;
+ if (digitalRead(RELAYpin))
+ {
+   if (millis() - startTime >= interval)   //  IF time interval (Pi boot time) has elapsed...
+   {
+     digitalWrite(RELAYpin, LOW);   //  Turn 5V Relay OFF (don't worry, if Pi has booted, it will keep relay Enabled)
+   }
+ }
+}
+}
+}

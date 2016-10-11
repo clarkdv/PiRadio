@@ -1,0 +1,39 @@
+
+#!/bin/python  
+# Red and Yellow LEDs ON, then Shutdown DELAY blinks Yellow LED, Red LED remains ON.  
+# /home/pi/scripts/redyellowLEDs.py 
+
+import RPi.GPIO as GPIO
+import time
+  
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings (False)
+GPIO.setup(24, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+GPIO.setup(17, GPIO.OUT, initial=1)  #Set GPIO 17 as output for Yellow LED and turn it On
+GPIO.setup(27, GPIO.OUT, initial=1)  #Set GPIO 27 as output for Red LED and turn it On
+
+blinking = False
+while True:
+   if not GPIO.input(24):   #if Pin 24 is LOW (if not) then run blinking routine
+       blinking = True
+
+   while blinking:
+      GPIO.output(17, GPIO.HIGH)
+      time.sleep(.2)
+      GPIO.output(17, GPIO.LOW)
+      time.sleep(.2)
+
+      time.sleep(.1)
+
+
+After saving the python script, you need to do a chmod to make it executable:
+
+sudo chmod +x /home/pi/scripts/redyellowLEDs.py
+
+
+To run a python script at startup or reboot via crontab:
+
+crontab -e
+
+@reboot python /home/pi/scripts/redyellowLEDs.py &
+
